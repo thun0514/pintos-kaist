@@ -599,7 +599,8 @@ allocate_tid (void) {
 }
 
 /** add code - Alarm clock */
-void thread_sleep (int64_t ticks) {
+void
+thread_sleep (int64_t ticks) {
 	struct thread *cur = thread_current ();
 	enum intr_level old_level;
 
@@ -607,38 +608,40 @@ void thread_sleep (int64_t ticks) {
 
 	old_level = intr_disable ();	/** pause interrupt */
 
-	update_next_tick_to_awake(cur->wakeup_tick = ticks);	/** update awake ticks */
+	update_next_tick_to_awake (cur->wakeup_tick = ticks);	/** update awake ticks */
 	list_push_back (&sleep_list, &cur->elem);
 	thread_block ();
 
 	intr_set_level (old_level);		/** interrupt on */
 }
 
-void thread_awake (int64_t wakeup_tick) {
+void
+thread_awake (int64_t wakeup_tick) {
     next_tick_to_awake = INT64_MAX;
 
     struct list_elem *sleeping;
-    sleeping = list_begin(&sleep_list);  /** take sleeping thread */
+    sleeping = list_begin (&sleep_list);  /** take sleeping thread */
 
-    while (sleeping != list_end(&sleep_list)) {  /** for all sleeping threads */
-        struct thread *th = list_entry(sleeping, struct thread, elem);
+    while (sleeping != list_end (&sleep_list)) {  /** for all sleeping threads */
+        struct thread *th = list_entry (sleeping, struct thread, elem);
 
         if (wakeup_tick >= th->wakeup_tick) {
-            sleeping = list_remove(&th->elem);  /** delete thread */
-            thread_unblock(th);                 /** unblock thread */
+            sleeping = list_remove (&th->elem);	/** delete thread */
+            thread_unblock (th);                /** unblock thread */
         } else {
-            sleeping = list_next(sleeping);              /** move to next sleeping thread */
-            update_next_tick_to_awake(th->wakeup_tick);  /** update wakeup_tick */
+            sleeping = list_next (sleeping);	 /** move to next sleeping thread */
+            update_next_tick_to_awake (th->wakeup_tick);  /** update wakeup_tick */
         }
     }
 }
 
-void update_next_tick_to_awake (int64_t ticks) {
+void
+update_next_tick_to_awake (int64_t ticks) {
 	/** find smallest tick */
     next_tick_to_awake = (next_tick_to_awake > ticks) ? ticks : next_tick_to_awake;
 }
 
-int64_t get_next_tick_to_awake(void) {
+int64_t get_next_tick_to_awake (void) {
 	return next_tick_to_awake;
 }
 /** end code - Alarm clock */
