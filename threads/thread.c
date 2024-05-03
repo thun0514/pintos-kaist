@@ -216,6 +216,11 @@ thread_create (const char *name, int priority,
 	/* Add to run queue. */
 	thread_unblock (t);
 
+	/** add code - Priority Scheduling */
+	if(t->priority > thread_current()->priority)
+		thread_yield();
+	/** end code - Priority Scheduling */
+
 	return tid;
 }
 
