@@ -597,3 +597,20 @@ allocate_tid (void) {
 
 	return tid;
 }
+
+/** add code - Alarm clock */
+void thread_sleep (int64_t ticks) {
+	struct thread *cur = thread_current ();
+	enum intr_level old_level;
+
+	ASSERT(cur != idle_thread); 	/** current thread is running */
+
+	old_level = intr_disable ();	/** pause interrupt */
+
+	update_next_tick_to_awake(cur->wakeup_tick = ticks);	/** update awake ticks */
+	list_push_back (&sleep_list, &cur->elem);
+	thread_block ();
+
+	intr_set_level (old_level);		/** interrupt on */
+}
+/** end code - Alarm clock */
