@@ -613,4 +613,23 @@ void thread_sleep (int64_t ticks) {
 
 	intr_set_level (old_level);		/** interrupt on */
 }
+
+void thread_awake (int64_t wakeup_tick) {
+    next_tick_to_awake = INT64_MAX;
+
+    struct list_elem *sleeping;
+    sleeping = list_begin(&sleep_list);  /** take sleeping thread */
+
+    while (sleeping != list_end(&sleep_list)) {  /** for all sleeping threads */
+        struct thread *th = list_entry(sleeping, struct thread, elem);
+
+        if (wakeup_tick >= th->wakeup_tick) {
+            sleeping = list_remove(&th->elem);  /** delete thread */
+            thread_unblock(th);                 /** unblock thread */
+        } else {
+            sleeping = list_next(sleeping);              /** move to next sleeping thread */
+            update_next_tick_to_awake(th->wakeup_tick);  /** update wakeup_tick */
+        }
+    }
+}
 /** end code - Alarm clock */
