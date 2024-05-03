@@ -54,6 +54,12 @@ static unsigned thread_ticks;   /* # of timer ticks since last yield. */
    Controlled by kernel command-line option "-o mlfqs". */
 bool thread_mlfqs;
 
+/** add code - Alarm clock */
+/** List of processes waiting for an event to occur before they can proceed. */
+static struct list sleep_list;
+static int64_t next_tick_to_awake = INT64_MAX;
+/** end code - Alarm clock */
+
 static void kernel_thread (thread_func *, void *aux);
 
 static void idle (void *aux UNUSED);
@@ -109,6 +115,9 @@ thread_init (void) {
 	lock_init (&tid_lock);
 	list_init (&ready_list);
 	list_init (&destruction_req);
+	/** add code - Alarm clock */
+	list_init (&sleep_list);
+	/** end code - Alarm clock*/
 
 	/* Set up a thread structure for the running thread. */
 	initial_thread = running_thread ();
