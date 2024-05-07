@@ -108,8 +108,12 @@ void sema_up(struct semaphore *sema) {
     ASSERT(sema != NULL);
 
     old_level = intr_disable();
-    if (!list_empty(&sema->waiters))
+    if (!list_empty(&sema->waiters)){
+		/** Project 1: Threads - Priority Scheduling (2)
+		 *  waiters에 있는 쓰레드의 우선순위가 변경되었을 경우를 고려하여 waiters를 정렬 */
+		list_sort(&sema->waiters, cmp_priority, NULL);
         thread_unblock(list_entry(list_pop_front(&sema->waiters), struct thread, elem));
+	}
     sema->value++;
     intr_set_level(old_level);
 }
