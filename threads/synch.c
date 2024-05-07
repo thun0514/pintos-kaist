@@ -273,11 +273,11 @@ void cond_wait(struct condition *cond, struct lock *lock) {
     ASSERT(lock_held_by_current_thread(lock));
 
     sema_init(&waiter.semaphore, 0);
-	/** Project 1: Threads - Priority Scheduling (2) 
-	 *  condition variable의 waiters에 우선순위 순서로 삽입되도록 수정 */
+    /** Project 1: Threads - Priority Scheduling (2)
+     *  condition variable의 waiters에 우선순위 순서로 삽입되도록 수정 */
     // list_push_back(&cond->waiters, &waiter.elem);
-	list_insert_ordered(&cond->waiters, &waiter.elem, cmp_sem_priority, NULL);
-	
+    list_insert_ordered(&cond->waiters, &waiter.elem, cmp_sem_priority, NULL);
+
     lock_release(lock);
     sema_down(&waiter.semaphore);
     lock_acquire(lock);
@@ -296,9 +296,14 @@ void cond_signal(struct condition *cond, struct lock *lock UNUSED) {
     ASSERT(!intr_context());
     ASSERT(lock_held_by_current_thread(lock));
 
-    if (!list_empty(&cond->waiters))
-        sema_up(
-            &list_entry(list_pop_front(&cond->waiters), struct semaphore_elem, elem)->semaphore);
+    if (!list_empty(&cond->waiters)) {
+        /** Project 1: Threads - Priority Scheduling (2)
+         *  대기 중에 우선순위가 변경되었을 가능성을 고려해
+         *  condition variable의 waiters를 우선순위로 재정렬 */
+        list_sort(&cond->waiters, cmp_sem_priority, NULL);
+        sema_up(&list_entry(list_pop_front(&cond->waiters),
+							struct semaphore_elem, elem)->semaphore);
+    }
 }
 
 /* Wakes up all threads, if any, waiting on COND (protected by
@@ -317,7 +322,8 @@ void cond_broadcast(struct condition *cond, struct lock *lock) {
 
 /** Project 1: Threads - Priority Scheduling (2) */
 
-bool cmp_sem_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {
+bool cmp_sem_priority(const struct list_elem *a, 
+						const struct list_elem *b, void *aux UNUSED) {
     struct semaphore_elem *sema_a = list_entry(a, struct semaphore_elem, elem);
     struct semaphore_elem *sema_b = list_entry(b, struct semaphore_elem, elem);
 
