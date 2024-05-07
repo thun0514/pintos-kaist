@@ -66,11 +66,11 @@ void sema_down(struct semaphore *sema) {
 
     old_level = intr_disable();
     while (sema->value == 0) {
-		/** Project 1: Thread - Priority Scheduling (2)
-		 *  semaphore를 얻고 waiters list 삽입 시, 우선순위대로 삽입되도록 수정 */
+        /** Project 1: Thread - Priority Scheduling (2)
+         *  semaphore를 얻고 waiters list 삽입 시, 우선순위대로 삽입되도록 수정 */
         // list_push_back (&sema->waiters, &thread_current ()->elem);
-		list_insert_ordered(&sema->waiters, &thread_current()->elem, cmp_priority, NULL);
-		thread_block ();
+        list_insert_ordered(&sema->waiters, &thread_current()->elem, cmp_priority, NULL);
+        thread_block();
     }
     sema->value--;
     intr_set_level(old_level);
@@ -108,12 +108,12 @@ void sema_up(struct semaphore *sema) {
     ASSERT(sema != NULL);
 
     old_level = intr_disable();
-    if (!list_empty(&sema->waiters)){
-		/** Project 1: Threads - Priority Scheduling (2)
-		 *  waiters에 있는 쓰레드의 우선순위가 변경되었을 경우를 고려하여 waiters를 정렬 */
-		list_sort(&sema->waiters, cmp_priority, NULL);
+    if (!list_empty(&sema->waiters)) {
+        /** Project 1: Threads - Priority Scheduling (2)
+         *  waiters에 있는 쓰레드의 우선순위가 변경되었을 경우를 고려하여 waiters를 정렬 */
+        list_sort(&sema->waiters, cmp_priority, NULL);
         thread_unblock(list_entry(list_pop_front(&sema->waiters), struct thread, elem));
-	}
+    }
     sema->value++;
     intr_set_level(old_level);
 }
@@ -273,7 +273,11 @@ void cond_wait(struct condition *cond, struct lock *lock) {
     ASSERT(lock_held_by_current_thread(lock));
 
     sema_init(&waiter.semaphore, 0);
-    list_push_back(&cond->waiters, &waiter.elem);
+	/** Project 1: Threads - Priority Scheduling (2) 
+	 *  condition variable의 waiters에 우선순위 순서로 삽입되도록 수정 */
+    // list_push_back(&cond->waiters, &waiter.elem);
+	list_insert_ordered(&cond->waiters, &waiter.elem, cmp_sem_priority, NULL);
+	
     lock_release(lock);
     sema_down(&waiter.semaphore);
     lock_acquire(lock);
@@ -312,6 +316,7 @@ void cond_broadcast(struct condition *cond, struct lock *lock) {
 }
 
 /** Project 1: Threads - Priority Scheduling (2) */
+
 bool cmp_sem_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {
     struct semaphore_elem *sema_a = list_entry(a, struct semaphore_elem, elem);
     struct semaphore_elem *sema_b = list_entry(b, struct semaphore_elem, elem);
