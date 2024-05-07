@@ -66,8 +66,11 @@ void sema_down(struct semaphore *sema) {
 
     old_level = intr_disable();
     while (sema->value == 0) {
-        list_push_back(&sema->waiters, &thread_current()->elem);
-        thread_block();
+		/** Project 1: Thread - Priority Scheduling (2)
+		 *  semaphore를 얻고 waiters list 삽입 시, 우선순위대로 삽입되도록 수정 */
+        // list_push_back (&sema->waiters, &thread_current ()->elem);
+		list_insert_ordered(&sema->waiters, &thread_current()->elem, cmp_priority, NULL);
+		thread_block ();
     }
     sema->value--;
     intr_set_level(old_level);
