@@ -160,7 +160,7 @@ void thread_tick(void);
 void thread_print_stats(void);
 /** end code - Alarm clock */
 
-/** Project 1: Threads - Priority Scheduling */
+/** Project 1: Threads - Priority Scheduling (1) */
 void test_max_priority(void);
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 /** end code - Priority Shceduling */

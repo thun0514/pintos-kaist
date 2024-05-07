@@ -207,7 +207,7 @@ tid_t thread_create(const char *name, int priority, thread_func *function, void 
     /* Add to run queue. */
     thread_unblock(t);
 
-    /** Project 1: Threads - Priority Scheduling */
+    /** Project 1: Threads - Priority Scheduling (1) */
     if (t->priority > thread_current()->priority)
         thread_yield();
     /** end code - Priority Scheduling */
@@ -629,7 +629,7 @@ int64_t get_next_tick_to_awake(void) {
 }
 /** end code - Alarm clock */
 
-/** Project 1: Threads - Priority Scheduling */
+/** Project 1: Threads - Priority Scheduling (1) */
 
 /** 인자로 주어진 스레드들의 우선순위를 비교 */
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {
