@@ -203,7 +203,7 @@ void lock_acquire(struct lock *lock) {
     /** Project 1: Threads - Priority inversion problem */
     t->wait_lock = NULL;
     /** end code - Priority inversion problem */
-    
+
     lock->holder = thread_current();
 }
 
@@ -236,6 +236,12 @@ void lock_release(struct lock *lock) {
     ASSERT(lock_held_by_current_thread(lock));
 
     lock->holder = NULL;
+
+    /** Project 1: Threads - Priority inversion problem */
+    remove_with_lock(lock);
+	refresh_priority();
+    /** end code - Priority inversion problem */
+
     sema_up(&lock->semaphore);
 }
 
