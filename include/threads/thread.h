@@ -171,4 +171,10 @@ void thread_print_stats(void);
 void test_max_priority(void);
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 /** end code - Priority Shceduling */
+
+/** Project 1: Threads - Priority inversion problem */
+void donate_priority (void);
+void remove_with_lock (struct lock *lock);
+void refresh_priority (void);
+/** end code - Priority inversion problem */
 #endif /* threads/thread.h */
