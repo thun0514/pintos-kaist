@@ -189,7 +189,21 @@ void lock_acquire(struct lock *lock) {
     ASSERT(!intr_context());
     ASSERT(!lock_held_by_current_thread(lock));
 
+    /** Project 1: Threads - Priority inversion problem */
+    struct thread *t = thread_current();
+    if (lock->holder != NULL) {
+    	t->wait_lock = lock;
+		list_push_back(&lock->holder->donations, &t->donation_elem);
+		donate_priority();
+	}
+    /** end code - Priority inversion problem */
+
     sema_down(&lock->semaphore);
+
+    /** Project 1: Threads - Priority inversion problem */
+    t->wait_lock = NULL;
+    /** end code - Priority inversion problem */
+    
     lock->holder = thread_current();
 }
 
