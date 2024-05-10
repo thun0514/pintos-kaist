@@ -111,6 +111,13 @@ struct thread {
     /* Owned by thread.c. */
     struct intr_frame tf; /* Information for switching */
     unsigned magic;       /* Detects stack overflow. */
+
+    /** Project 1: Threads - Priority inversion problem */
+    int original_priority;
+    struct lock *wait_lock;
+    struct list donations;
+    struct list_elem donation_elem;
+    /** end code - Priority inversion problem */
 };
 
 /* If false (default), use round-robin scheduler.
