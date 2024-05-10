@@ -661,3 +661,18 @@ void test_max_priority(void) {
         thread_yield();
 }
 /** end code - Priority Scheduling */
+
+/** Project 1: Threads - Priority inversion problem */
+void donate_priority() {
+	struct thread *t = thread_current();
+	int priority = t->priority;
+
+	for (int depth = 0; depth < 8; depth++) {
+    	if (t->wait_lock == NULL)
+			break;
+
+		t = t->wait_lock->holder;
+		t->priority = priority;
+	}
+}
+/** end code - Priority inversion problem */
